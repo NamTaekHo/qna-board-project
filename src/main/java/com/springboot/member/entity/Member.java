@@ -1,6 +1,7 @@
 package com.springboot.member.entity;
 
 import com.springboot.audit.BaseEntity;
+import com.springboot.like.entity.Like;
 import com.springboot.question.entity.Question;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,8 +48,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Question> questions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
-    private List<Like> likes = new ArrayList<>();
+//    @OneToMany(mappedBy = "member")
+//    private List<Like> likes = new ArrayList<>();
 
 
 
