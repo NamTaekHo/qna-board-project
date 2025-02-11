@@ -43,6 +43,9 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Column(nullable = false)
+    private int likeCount = 0;
+
     public enum QuestionStatus{
         QUESTION_REGISTERED("질문 등록"),
         QUESTION_ANSWERED("답변 완료"),
