@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -19,9 +20,11 @@ public class Question extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questionId;
 
+    @NotBlank(message = "제목을 입력해주세요.")
     @Column(length = 50, nullable = false)
     private String title;
 
+    @NotBlank(message = "내용을 입력해주세요.")
     @Column(nullable = false)
     private String content;
 
@@ -34,7 +37,7 @@ public class Question extends BaseEntity {
     private Visibility visibility = Visibility.QUESTION_PUBLIC;
 
     @Column(nullable = false)
-    private int viewCount;
+    private int viewCount = 0;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
