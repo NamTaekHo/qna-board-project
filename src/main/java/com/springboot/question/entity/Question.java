@@ -1,5 +1,6 @@
 package com.springboot.question.entity;
 
+import com.springboot.answer.entity.Answer;
 import com.springboot.audit.BaseEntity;
 import com.springboot.member.entity.Member;
 import lombok.AllArgsConstructor;
@@ -43,8 +44,25 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Answer answer;
+
     @Column(nullable = false)
     private int likeCount = 0;
+
+    public void setMember(Member member){
+        this.member = member;
+        if(!member.getQuestions().contains(this)){
+            member.setQuestion(this);
+        }
+    }
+
+    public void setAnswer(Answer answer){
+        this.answer = answer;
+        if(answer != null){
+            answer.setQuestion(this);
+        }
+    }
 
     public enum QuestionStatus{
         QUESTION_REGISTERED("질문 등록"),

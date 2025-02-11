@@ -36,6 +36,13 @@ public class Answer extends BaseEntity {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
+    public void setQuestion(Question question){
+        this.question = question;
+        if(question != null && question.getAnswer() != this){
+            question.setAnswer(this);
+        }
+    }
+
     public enum AnswerStatus{
         ANSWER_PUBLIC("공개 답변"),
         ANSWER_SECRET("비공개 답변");

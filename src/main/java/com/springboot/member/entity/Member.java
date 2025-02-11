@@ -45,22 +45,30 @@ public class Member extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Question> questions = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "member")
 //    private List<Like> likes = new ArrayList<>();
 
+    public void setQuestion(Question question) {
+        if (question.getMember() != this) {
+            question.setMember(this);
+        }
+        if (!this.questions.contains(question)) {
+            this.questions.add(question);
+        }
+    }
 
 
-    public enum MemberStatus{
+    public enum MemberStatus {
         MEMBER_ACTIVE("일반 회원"),
         MEMBER_QUIT("탈퇴 회원");
 
         @Getter
         private String status;
 
-        MemberStatus(String status){
+        MemberStatus(String status) {
             this.status = status;
         }
     }

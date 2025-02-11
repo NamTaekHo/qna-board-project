@@ -1,22 +1,27 @@
-package com.springboot.member;
+package com.springboot.member.service;
 
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import com.springboot.question.entity.Question;
+import com.springboot.question.repository.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final QuestionRepository questionRepository;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, QuestionRepository questionRepository) {
         this.memberRepository = memberRepository;
+        this.questionRepository = questionRepository;
     }
 
     public Member createMember(Member member){
@@ -51,6 +56,12 @@ public class MemberService {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND);
         }
         findMember.setMemberStatus(Member.MemberStatus.MEMBER_QUIT);
+        findMember.getQuestions().stream()
+                        .forEach(question -> {
+                            question.setQuestionStatus(Question.QuestionStatus.QUESTION_DEACTIVED);
+                            questionRepository.save(question);
+                        });
+
         memberRepository.save(findMember);
     }
 
