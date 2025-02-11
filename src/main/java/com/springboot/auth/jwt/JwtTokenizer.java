@@ -1,4 +1,4 @@
-package com.springboot.auth;
+package com.springboot.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
