@@ -30,7 +30,7 @@ public class LikeService {
         // member 찾기
         Member member = memberService.findMember(memberId);
         // 이미 좋아요 눌렀는지 확인
-        if (likeRepository.existsByQuestionIdAndMemberId(questionId, memberId)) {
+        if (likeRepository.existsByQuestion_QuestionIdAndMember_MemberId(questionId, memberId)) {
             throw new BusinessLogicException(ExceptionCode.ALREADY_LIKED);
         }
         Like like = new Like();
@@ -44,7 +44,7 @@ public class LikeService {
     @Transactional
     public void deleteLike(Long questionId, Long memberId) {
         // 좋아요 기록 있는지 확인
-        Like like = likeRepository.findByQuestionIdAndMemberId(questionId, memberId).orElseThrow(
+        Like like = likeRepository.findByQuestion_QuestionIdAndMember_MemberId(questionId, memberId).orElseThrow(
                 () -> new BusinessLogicException(ExceptionCode.LIKE_NOT_FOUND)
         );
         // 좋아요 DB에서 삭제

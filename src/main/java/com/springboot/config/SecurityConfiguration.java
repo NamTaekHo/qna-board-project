@@ -68,7 +68,7 @@ public class SecurityConfiguration {
         // setAllowedOrigins : 모든 출처에 대해 허용
         configuration.setAllowedOrigins(Arrays.asList("*"));
         // setAllowedMethods : 지정한 HTTP Method 에 대한 통신 허용
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
 
         // UrlBasedCorsConfigurationSource : CorsConfigurationSource의 구현체
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -93,7 +93,7 @@ public class SecurityConfiguration {
             // JwtAuthenticationFilter에서 사용되는 AuthenticationManager와 JwtTokenizer를 DI
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);
             // setFilterProcessesUrl() 메서드를 통해 디폴트 request URL인 “/login”을 “/v11/auth/login”으로 변경
-            jwtAuthenticationFilter.setFilterProcessesUrl("/v11/auth/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/qna/auth/login");
 
             // success handler 등록
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());

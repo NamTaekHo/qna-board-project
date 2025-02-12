@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
     // 중복 확인
-    boolean existsByQuestionIdAndMemberId(long questionId, long memberId);
+    boolean existsByQuestion_QuestionIdAndMember_MemberId(long questionId, long memberId);
     // questionId 와 memberId 로 해당 Like 찾기
-    Optional<Like> findByQuestionIdAndMemberId(long questionId, long memberId);
+    Optional<Like> findByQuestion_QuestionIdAndMember_MemberId(long questionId, long memberId);
     // 질문에 대한 좋아요 수 계산
-    int countByQuestionId(long questionId);
+    int countByQuestion_QuestionId(long questionId);
 }
