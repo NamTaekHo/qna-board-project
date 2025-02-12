@@ -21,9 +21,9 @@ public class Answer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long answerId;
 
-    @NotBlank(message = "답변 제목을 입력해주세요.")
-    @Column(nullable = false, length = 50)
-    private String title;
+//    @NotBlank(message = "답변 제목을 입력해주세요.")
+//    @Column(nullable = false, length = 50)
+//    private String title;
 
     @NotBlank(message = "답변 내용을 입력해주세요.")
     @Column(nullable = false, length = 255)
@@ -46,6 +46,10 @@ public class Answer extends BaseEntity {
         if(question != null && question.getAnswer() != this){
             question.setAnswer(this);
         }
+    }
+
+    public String getTitle(){
+        return "[RE] " + this.question.getTitle();
     }
 
     public enum AnswerStatus{
