@@ -48,9 +48,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "member")
-//    private List<Like> likes = new ArrayList<>();
-
     public void setQuestion(Question question) {
         if (question.getMember() != this) {
             question.setMember(this);
