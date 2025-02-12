@@ -24,11 +24,11 @@ public class LikeService {
     }
 
     @Transactional
-    public void addLike(Long questionId, Long memberId) {
+    public void addLike(long questionId, long memberId, long currentId) {
         // Question 있는지 검증
         Question question = questionService.findVerifiedQuestion(questionId);
         // member 찾기
-        Member member = memberService.findMember(memberId);
+        Member member = memberService.findMember(memberId, currentId);
         // 이미 좋아요 눌렀는지 확인
         if (likeRepository.existsByQuestion_QuestionIdAndMember_MemberId(questionId, memberId)) {
             throw new BusinessLogicException(ExceptionCode.ALREADY_LIKED);

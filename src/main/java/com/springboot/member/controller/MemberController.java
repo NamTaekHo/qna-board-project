@@ -43,7 +43,6 @@ public class MemberController {
     }
 
     @PatchMapping("/{member-id}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
     public ResponseEntity patchMember(
             @PathVariable("member-id") @Positive long memberId,
             @Valid @RequestBody MemberDto.Patch patchDto,

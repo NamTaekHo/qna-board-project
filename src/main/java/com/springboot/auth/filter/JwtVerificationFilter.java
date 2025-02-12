@@ -1,5 +1,6 @@
 package com.springboot.auth.filter;
 
+import com.springboot.auth.MemberDetailsService;
 import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -21,10 +23,12 @@ import java.util.Map;
 public class JwtVerificationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
     private final AuthorityUtils authorityUtils;
+    private final MemberDetailsService memberDetailsService;
 
-    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils) {
+    public JwtVerificationFilter(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
+        this.memberDetailsService = memberDetailsService;
     }
 
     @Override
@@ -79,8 +83,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         String username = (String) claims.get("username");
         // Claims에서 얻은 권한 정보를 기반으로 List<GrantedAuthority를 생성
         List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));
+        // UserDetailsService를 통해 MemberDetails 가져오기
+        MemberDetailsService.MemberDetails memberDetails = (MemberDetailsService.MemberDetails) memberDetailsService.loadUserByUsername(username);
         // username과 List<GrantedAuthority를 포함한 Authentication 객체를 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, authorities);
         // SecurityContext에 Authentication 객체를 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

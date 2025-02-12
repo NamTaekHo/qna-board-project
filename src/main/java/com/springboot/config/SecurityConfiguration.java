@@ -1,5 +1,6 @@
 package com.springboot.config;
 
+import com.springboot.auth.MemberDetailsService;
 import com.springboot.auth.filter.JwtAuthenticationFilter;
 import com.springboot.auth.filter.JwtVerificationFilter;
 import com.springboot.auth.handler.MemberAccessDeniedHandler;
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,10 +33,12 @@ import java.util.Arrays;
 public class SecurityConfiguration {
     private final JwtTokenizer jwtTokenizer;
     private final AuthorityUtils authorityUtils;
+    private final MemberDetailsService memberDetailsService;
 
-    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils) {
+    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
+        this.memberDetailsService = memberDetailsService;
     }
 
     @Bean
@@ -109,7 +113,7 @@ public class SecurityConfiguration {
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
             //  JwtVerificationFilter의 인스턴스를 생성 + JwtVerificationFilter에서 사용되는 객체들을 생성자로 DI
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, memberDetailsService);
 
             // addFilter() 메서드를 통해 JwtAuthenticationFilter를 Spring Security Filter Chain에 추가
             builder.addFilter(jwtAuthenticationFilter)

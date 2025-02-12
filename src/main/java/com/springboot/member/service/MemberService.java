@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final QuestionRepository questionRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthorityUtils authorityUtils;
 
     public MemberService(MemberRepository memberRepository, QuestionRepository questionRepository, PasswordEncoder passwordEncoder, AuthorityUtils authorityUtils) {
         this.memberRepository = memberRepository;
-        this.questionRepository = questionRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityUtils = authorityUtils;
     }
