@@ -10,6 +10,8 @@ import com.springboot.question.repository.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +47,12 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member updateMember(Member member){
+    public Member updateMember(Member member, long currentMemberId){
         // 존재하는지 검증
         Member findMember = findVerifiedMember(member.getMemberId());
+        // 현재 로그인 된 사용자와 동일한지 확인
+        verifyAccess(member.getMemberId(), currentMemberId);
+
         // 변경 가능한 필드 확인 후 변경
         Optional.ofNullable(member.getPhone())
                 .ifPresent(phone -> findMember.setPhone(phone));
@@ -59,7 +64,9 @@ public class MemberService {
         return memberRepository.save(findMember);
     }
 
-    public Member findMember(long memberId){
+    public Member findMember(long memberId, long currentMemberId){
+        // 로그인한 멤버와 동일한지 검증
+        verifyAccess(memberId, currentMemberId);
         // 있는지 검증 후 반환
         return findVerifiedMember(memberId);
     }
@@ -74,7 +81,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMember(long memberId){
+    public void deleteMember(long memberId, long currentMemberId){
+        // 로그인한 사용자와 동일한지, 관리자인지 확인
+        verifyAccess(memberId, currentMemberId);
         // 있는지 검증 후 가져와서
         Member findMember = findVerifiedMember(memberId);
         // 이미 탈퇴 상태면 예외 발생
@@ -101,5 +110,19 @@ public class MemberService {
         Member findMember = optionalMember.orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
         return findMember;
+    }
+
+    // 관리자인지 확인하는 메서드
+    private boolean isAdmin(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().stream().anyMatch(grantedAuthority ->
+                grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    // 관리자인지 동일한지 확인하고 아니면 예외던지는 메서드
+    public void verifyAccess(long requestedId, long currentId){
+        if(requestedId != currentId && isAdmin()){
+            throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_OPERATION);
+        }
     }
 }

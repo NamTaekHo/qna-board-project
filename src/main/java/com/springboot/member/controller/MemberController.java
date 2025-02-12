@@ -1,5 +1,6 @@
 package com.springboot.member.controller;
 
+import com.springboot.auth.MemberDetailsService;
 import com.springboot.dto.MultiResponseDto;
 import com.springboot.dto.SingleResponseDto;
 import com.springboot.member.dto.MemberDto;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,21 +43,23 @@ public class MemberController {
     }
 
     @PatchMapping("/{member-id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
     public ResponseEntity patchMember(
             @PathVariable("member-id") @Positive long memberId,
-            @Valid @RequestBody MemberDto.Patch patchDto
+            @Valid @RequestBody MemberDto.Patch patchDto,
+            @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails
     ){
         patchDto.setMemberId(memberId);
-        Member member = memberService.updateMember(mapper.memberPatchToMember(patchDto));
+        Member member = memberService.updateMember(mapper.memberPatchToMember(patchDto), memberDetails.getMemberId());
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponse(member)), HttpStatus.OK);
     }
 
     @GetMapping("/{member-id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
     public ResponseEntity getMember(
-            @PathVariable("member-id") @Positive long memberId){
-        Member member = memberService.findMember(memberId);
+            @PathVariable("member-id") @Positive long memberId,
+            @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails){
+        Member member = memberService.findMember(memberId, memberDetails.getMemberId());
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponse(member)), HttpStatus.OK);
     }
 
@@ -70,9 +74,10 @@ public class MemberController {
     }
 
     @DeleteMapping("/{member-id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
-    public ResponseEntity deleteMember(@PathVariable("member-id") long memberId){
-        memberService.deleteMember(memberId);
+//    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
+    public ResponseEntity deleteMember(@PathVariable("member-id") long memberId,
+                                       @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails){
+        memberService.deleteMember(memberId, memberDetails.getMemberId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

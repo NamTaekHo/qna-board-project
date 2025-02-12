@@ -10,8 +10,10 @@ import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true) // 메서드 보안 활성화
 public class SecurityConfiguration {
     private final JwtTokenizer jwtTokenizer;
     private final AuthorityUtils authorityUtils;
@@ -52,6 +55,11 @@ public class SecurityConfiguration {
                 .apply(new CustomFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
+                        .antMatchers(HttpMethod.GET, "/qna/members/**").authenticated()
+                        .antMatchers(HttpMethod.GET, "/qna/members").hasRole("ADMIN")
+                        .antMatchers(HttpMethod.PATCH, "/qna/members/**").authenticated()
+                        .antMatchers(HttpMethod.DELETE, "/qna/members/**").authenticated()
+                        .antMatchers(HttpMethod.POST, "/qna/members").permitAll()
                         .anyRequest().permitAll());
         return http.build();
     }
