@@ -10,7 +10,12 @@ public enum ExceptionCode {
     ORDER_NOT_FOUND(404, "Order not found"),
     CANNOT_CHANGE_ORDER(403, "Order can not change"),
     NOT_IMPLEMENTATION(501, "Not Implementation"),
-    INVALID_MEMBER_STATUS(400, "Invalid member status");
+    INVALID_MEMBER_STATUS(400, "Invalid member status"),
+    UNAUTHORIZED_OPERATION(403, "Can not access this resource"),
+    ANSWER_NOT_FOUND(404, "Answer not found"),
+    ANSWER_EXISTS(409, "Answer exists"),
+    CANNOT_CHANGE_QUESTION(403, "Question already answered"),
+    QUESTION_NOT_FOUND(404, "Question not found");
 
     @Getter
     private int status;
