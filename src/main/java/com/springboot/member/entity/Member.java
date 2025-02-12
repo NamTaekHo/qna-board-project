@@ -45,7 +45,7 @@ public class Member extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "member")
@@ -58,6 +58,11 @@ public class Member extends BaseEntity {
         if (!this.questions.contains(question)) {
             this.questions.add(question);
         }
+    }
+
+    public void deactivate(){
+        this.memberStatus = MemberStatus.MEMBER_QUIT;
+        this.questions.forEach(question -> question.deactivate());
     }
 
 

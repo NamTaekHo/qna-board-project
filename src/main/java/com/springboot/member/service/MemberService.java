@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,22 +48,22 @@ public class MemberService {
     }
 
     public Page<Member> findMembers(int page, int size){
+        if(page < 1){
+            throw new IllegalArgumentException("페이지의 번호는 1 이상이어야 합니다.");
+        }
         return memberRepository.findAll(PageRequest.of(page-1, size, Sort.by("memberId").descending()));
     }
 
+    @Transactional
     public void deleteMember(long memberId){
         Member findMember = findVerifiedMember(memberId);
         if(findMember.getMemberStatus() == Member.MemberStatus.MEMBER_QUIT){
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND);
         }
-        findMember.setMemberStatus(Member.MemberStatus.MEMBER_QUIT);
-        findMember.getQuestions().stream()
-                        .forEach(question -> {
-                            question.setQuestionStatus(Question.QuestionStatus.QUESTION_DEACTIVED);
-                            questionRepository.save(question);
-                        });
 
-        memberRepository.save(findMember);
+        findMember.deactivate();
+
+//        memberRepository.save(findMember);
     }
 
     private void verifyExistsEmail(String email){
@@ -72,7 +73,7 @@ public class MemberService {
         }
     }
 
-    private Member findVerifiedMember(long memberId){
+    public Member findVerifiedMember(long memberId){
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member findMember = optionalMember.orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));

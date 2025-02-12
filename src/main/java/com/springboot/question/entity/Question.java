@@ -57,6 +57,10 @@ public class Question extends BaseEntity {
         }
     }
 
+    public void deactivate(){
+        this.questionStatus = QuestionStatus.QUESTION_DEACTIVED;
+    }
+
     public void setAnswer(Answer answer){
         this.answer = answer;
         if(answer != null){
