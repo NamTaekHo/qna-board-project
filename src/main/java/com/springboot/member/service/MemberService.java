@@ -1,5 +1,6 @@
 package com.springboot.member.service;
 
+import com.springboot.auth.utils.AuthorityUtils;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
@@ -9,9 +10,11 @@ import com.springboot.question.repository.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,15 +22,25 @@ import java.util.stream.Collectors;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthorityUtils authorityUtils;
 
-    public MemberService(MemberRepository memberRepository, QuestionRepository questionRepository) {
+    public MemberService(MemberRepository memberRepository, QuestionRepository questionRepository, PasswordEncoder passwordEncoder, AuthorityUtils authorityUtils) {
         this.memberRepository = memberRepository;
         this.questionRepository = questionRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authorityUtils = authorityUtils;
     }
 
     public Member createMember(Member member){
         // 중복인지 검증
         verifyExistsEmail(member.getEmail());
+        // 비번 암호화
+        String encryptedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encryptedPassword);
+        // 역할 초기화
+        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        member.setRoles(roles);
         // 저장
         return memberRepository.save(member);
     }
@@ -40,8 +53,8 @@ public class MemberService {
                 .ifPresent(phone -> findMember.setPhone(phone));
         Optional.ofNullable(member.getName())
                 .ifPresent(name -> findMember.setName(name));
-        Optional.ofNullable(member.getMemberStatus())
-                .ifPresent(memberStatus -> findMember.setMemberStatus(memberStatus));
+//        Optional.ofNullable(member.getMemberStatus())
+//                .ifPresent(memberStatus -> findMember.setMemberStatus(memberStatus));
         // 저장
         return memberRepository.save(findMember);
     }
