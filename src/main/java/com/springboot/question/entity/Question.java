@@ -44,7 +44,7 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Answer answer;
 
     @Column(nullable = false)
@@ -65,7 +65,16 @@ public class Question extends BaseEntity {
         this.answer = answer;
         if(answer != null){
             answer.setQuestion(this);
+            this.questionStatus = QuestionStatus.QUESTION_ANSWERED;
         }
+    }
+
+    public void addLikeCount(){
+        this.likeCount += 1;
+    }
+
+    public void minusLikeCount(){
+        this.likeCount -= 1;
     }
 
     public enum QuestionStatus{
