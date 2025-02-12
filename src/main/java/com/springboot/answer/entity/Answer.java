@@ -1,6 +1,7 @@
 package com.springboot.answer.entity;
 
 import com.springboot.audit.BaseEntity;
+import com.springboot.member.entity.Member;
 import com.springboot.question.entity.Question;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,10 @@ public class Answer extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     public void setQuestion(Question question){
         this.question = question;
