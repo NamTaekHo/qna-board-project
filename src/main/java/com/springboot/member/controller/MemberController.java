@@ -1,5 +1,6 @@
 package com.springboot.member.controller;
 
+import com.springboot.auth.CustomPrincipal;
 import com.springboot.auth.MemberDetailsService;
 import com.springboot.dto.MultiResponseDto;
 import com.springboot.dto.SingleResponseDto;
@@ -46,10 +47,10 @@ public class MemberController {
     public ResponseEntity patchMember(
             @PathVariable("member-id") @Positive long memberId,
             @Valid @RequestBody MemberDto.Patch patchDto,
-            @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails
-    ){
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
+            ){
         patchDto.setMemberId(memberId);
-        Member member = memberService.updateMember(mapper.memberPatchToMember(patchDto), memberDetails.getMemberId());
+        Member member = memberService.updateMember(mapper.memberPatchToMember(patchDto), customPrincipal.getMemberId());
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponse(member)), HttpStatus.OK);
     }
 
@@ -57,8 +58,8 @@ public class MemberController {
 //    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
     public ResponseEntity getMember(
             @PathVariable("member-id") @Positive long memberId,
-            @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails){
-        Member member = memberService.findMember(memberId, memberDetails.getMemberId());
+            @AuthenticationPrincipal CustomPrincipal customPrincipal){
+        Member member = memberService.findMember(memberId, customPrincipal.getMemberId());
         return new ResponseEntity(new SingleResponseDto<>(mapper.memberToMemberResponse(member)), HttpStatus.OK);
     }
 
@@ -75,8 +76,8 @@ public class MemberController {
     @DeleteMapping("/{member-id}")
 //    @PreAuthorize("hasRole('ROLE_ADMIN') or #memberId == principal.memberId")
     public ResponseEntity deleteMember(@PathVariable("member-id") long memberId,
-                                       @AuthenticationPrincipal MemberDetailsService.MemberDetails memberDetails){
-        memberService.deleteMember(memberId, memberDetails.getMemberId());
+                                       @AuthenticationPrincipal CustomPrincipal customPrincipal){
+        memberService.deleteMember(memberId, customPrincipal.getMemberId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

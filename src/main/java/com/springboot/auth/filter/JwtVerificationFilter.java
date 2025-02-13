@@ -1,5 +1,6 @@
 package com.springboot.auth.filter;
 
+import com.springboot.auth.CustomPrincipal;
 import com.springboot.auth.MemberDetailsService;
 import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
@@ -85,8 +86,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));
         // UserDetailsService를 통해 MemberDetails 가져오기
         MemberDetailsService.MemberDetails memberDetails = (MemberDetailsService.MemberDetails) memberDetailsService.loadUserByUsername(username);
+        //customPrincipal 객체 생성
+        CustomPrincipal customPrincipal = new CustomPrincipal(username, memberDetails.getMemberId());
         // username과 List<GrantedAuthority를 포함한 Authentication 객체를 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(customPrincipal, null, authorities);
         // SecurityContext에 Authentication 객체를 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
