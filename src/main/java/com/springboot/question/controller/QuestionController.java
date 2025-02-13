@@ -4,6 +4,7 @@ import com.springboot.auth.CustomPrincipal;
 import com.springboot.auth.MemberDetailsService;
 import com.springboot.dto.MultiResponseDto;
 import com.springboot.dto.SingleResponseDto;
+import com.springboot.like.service.LikeService;
 import com.springboot.member.service.MemberService;
 import com.springboot.question.dto.QuestionDto;
 import com.springboot.question.entity.Question;
@@ -30,14 +31,14 @@ import java.util.List;
 @Slf4j
 public class QuestionController {
     private static final String QUESTION_DEFAULT_URL = "/qna/questions";
-    private final MemberService memberService;
     private final QuestionMapper questionMapper;
     private final QuestionService questionService;
+    private final LikeService likeService;
 
-    public QuestionController(MemberService memberService, QuestionMapper questionMapper, QuestionService questionService) {
-        this.memberService = memberService;
+    public QuestionController(QuestionMapper questionMapper, QuestionService questionService, LikeService likeService) {
         this.questionMapper = questionMapper;
         this.questionService = questionService;
+        this.likeService = likeService;
     }
 
     @PostMapping
@@ -90,4 +91,15 @@ public class QuestionController {
         questionService.deleteQuestion(questionId, customPrincipal.getMemberId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // Like 요청 주소
+    @PostMapping("/{question-id}/like")
+    public ResponseEntity toggleLike(
+            @PathVariable("question-id") long questionId,
+            @AuthenticationPrincipal CustomPrincipal customPrincipal){
+        likeService.toggleLike(questionId, customPrincipal.getMemberId());
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }
