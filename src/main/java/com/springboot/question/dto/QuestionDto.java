@@ -1,7 +1,9 @@
 package com.springboot.question.dto;
 
+import com.springboot.answer.dto.AnswerDto;
 import com.springboot.member.entity.Member;
 import com.springboot.question.entity.Question;
+import com.springboot.validator.NotSpace;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,26 +25,26 @@ public class QuestionDto {
         @NotBlank(message = "내용은 필수 입력란입니다.")
         private String content;
 
-        @NotBlank
         private Question.Visibility visibility;
 
-        @NotBlank
         private long memberId;
     }
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Setter
     public static class Patch{
         private long questionId;
 
-        @NotBlank
+        @NotSpace
         private String title;
 
-        @NotBlank
+        @NotSpace
         private String content;
 
-        @NotBlank
+        private long memberId;
+
         private Question.Visibility visibility;
     }
 
@@ -56,9 +58,10 @@ public class QuestionDto {
         private Question.Visibility visibility;
         private int viewCount;
         private long memberId;
-        private long answerId;
+        private AnswerDto.Response answer;
         private int likeCount;
         private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         public String getQuestionStatus(){
             return questionStatus.getStatus();

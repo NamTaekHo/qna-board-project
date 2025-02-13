@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q WHERE q.questionStatus != 'QUESTION_DEACTIVATED'")
-    Page<Question> findAllQuestions(Pageable pageable);
+    Page<Question> findAllQuestionsWithoutDeactivated(Pageable pageable);
 
     @Query("SELECT q FROM Question q WHERE q.id = :questionId AND "
     + "(q.visibility = 'QUESTION_PUBLIC' OR (q.visibility = 'QUESTION_SECRET' AND "

@@ -6,6 +6,7 @@ import com.springboot.member.entity.Member;
 import com.springboot.member.service.MemberService;
 import com.springboot.question.entity.Question;
 import com.springboot.question.repository.QuestionRepository;
+import com.springboot.utils.AuthorizationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,9 +32,7 @@ public class QuestionService {
 
     public Question updateQuestion(Question question, long memberId){
         // 작성자인지 확인
-        if(question.getMember().getMemberId() != memberId){
-            throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_OPERATION);
-        }
+        AuthorizationUtils.isOwner(question.getMember().getMemberId(), memberId);
         // 답변 완료시 수정 불가능
         isAnswered(question.getQuestionId());
         // 제목, 내용, visibility
@@ -47,17 +46,17 @@ public class QuestionService {
         return questionRepository.save(findQuestion);
     }
 
-    public Page<Question> getQuestions(int page, int size){
+    public Page<Question> findQuestions(int page, int size){
         // 페이지 번호 검증
         if(page < 1){
             throw new IllegalArgumentException("페이지의 번호는 1 이상이어야 합니다.");
         }
         Pageable pageable = PageRequest.of(page -1, size, Sort.by("questionId").descending());
         // 비밀글 제외하고 조회(repo 쿼리)
-        return questionRepository.findAllQuestions(pageable);
+        return questionRepository.findAllQuestionsWithoutDeactivated(pageable);
     }
 
-    public Question getQuestion(Long questionId, Long memberId, boolean isAdmin){
+    public Question findQuestion(Long questionId, Long memberId, boolean isAdmin){
         // Authentication 통해서 memberId와 관리자인지 받아와서 권한 없는 글에 접근 시 예외처리
         // public인 경우 전체 접근 가능, 비밀글인경우 작성자와 관리자만 접근 가능(repo 쿼리)
         return questionRepository.findQuestionByIdAndAccess(questionId, memberId, isAdmin)
@@ -68,9 +67,7 @@ public class QuestionService {
         // 질문 존재 확인해서 가져오고
         Question findQuestion = findVerifiedQuestion(questionId);
         // 작성자와 현재 사용자 같은지 확인
-        if(findQuestion.getMember().getMemberId() != memberId){
-            throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_OPERATION);
-        }
+        AuthorizationUtils.isOwner(findQuestion.getMember().getMemberId(), memberId);
         // 이미 삭제 상태인지 확인
         verifyQuestionStatus(findQuestion);
         // 상태 변경
@@ -98,6 +95,11 @@ public class QuestionService {
         if(question.getQuestionStatus() == Question.QuestionStatus.QUESTION_DELETED){
             throw new BusinessLogicException(ExceptionCode.QUESTION_NOT_FOUND);
         }
+    }
+
+    // 답변 삭제 시 질문의 answer null로 만드는 메서드
+    public void setAnswerNull(long questionId){
+        findVerifiedQuestion(questionId).setAnswer(null);
     }
 
 

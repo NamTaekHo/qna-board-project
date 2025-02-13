@@ -8,8 +8,10 @@ import com.springboot.member.entity.Member;
 import com.springboot.member.service.MemberService;
 import com.springboot.question.entity.Question;
 import com.springboot.question.service.QuestionService;
+import com.springboot.utils.AuthorizationUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,6 +30,8 @@ public class AnswerService {
     public Answer createAnswer(Answer answer) {
         // 멤버 있는지 검증
         memberService.findVerifiedMember(answer.getMember().getMemberId());
+        // 관리자인지 검증
+        AuthorizationUtils.isAdmin();
         // 질문이 있는지, 답변이 이미 있는지 검증
         Question question = verifyExistsAnswerInQuestion(answer);
         // 검증 다 통과하면 해당 질문의 visibility 상태 따라서 set
@@ -40,6 +44,8 @@ public class AnswerService {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Answer updateAnswer(Answer answer){
+        // 관리자인지 확인
+        AuthorizationUtils.isAdmin();
         // 답변 있는지 검증
         Answer findAnswer = findVerifiedAnswer(answer.getAnswerId());
         // 내용이 바뀌었으면 바꾼 후 저장
@@ -48,17 +54,15 @@ public class AnswerService {
         return answerRepository.save(findAnswer);
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteAnswer(long answerId){
+        // 관리자인지 확인
+        AuthorizationUtils.isAdmin();
         // 답변 있는지 확인
         Answer answer = findVerifiedAnswer(answerId);
-        // member 찾아오기
-//        Member member = memberService.findVerifiedMember(memberId);
-        // member roles에 관리자 권한 없으면 예외
-//        if(!member.getRoles().contains("ROLE_ADMIN")){
-//            throw new BusinessLogicException(ExceptionCode.UNAUTHORIZED_OPERATION);
-//        }
-        answerRepository.delete(answer);
+        questionService.setAnswerNull(answer.getQuestion().getQuestionId());
+        answerRepository.deleteById(answerId);
     }
 
     // 질문에 답변이 있는지 검증 후 질문 객체 반환
