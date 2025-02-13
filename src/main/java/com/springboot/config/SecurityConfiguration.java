@@ -59,11 +59,23 @@ public class SecurityConfiguration {
                 .apply(new CustomFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.GET, "/qna/members/**").authenticated()
+                        // Member
+                        .antMatchers(HttpMethod.GET, "/qna/members/**").hasAnyRole("USER", "ADMIN")
                         .antMatchers(HttpMethod.GET, "/qna/members").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.PATCH, "/qna/members/**").authenticated()
-                        .antMatchers(HttpMethod.DELETE, "/qna/members/**").authenticated()
-                        .antMatchers(HttpMethod.POST, "/qna/members").permitAll()
+                        .antMatchers(HttpMethod.PATCH, "/qna/members/**").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/qna/members/**").hasAnyRole("USER", "ADMIN")
+                        .antMatchers(HttpMethod.POST, "/qna/members").hasAnyRole("USER", "ADMIN")
+                        // Question
+                        .antMatchers(HttpMethod.POST, "/qna/questions").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/qna/questions/**").authenticated()
+                        .antMatchers(HttpMethod.GET, "/qna/questions/**").authenticated()
+                        .antMatchers(HttpMethod.GET, "/qna/questions").hasAnyRole("USER", "ADMIN")
+                        .antMatchers(HttpMethod.DELETE, "/qna/questions/**").hasRole("USER")
+                        // Answer
+                        .antMatchers("/qna/questions/**/answers").hasRole("ADMIN")
+                        .antMatchers("/qna/questions/**/answers/**").hasRole("ADMIN")
+                        // Like
+                        .antMatchers("/qna/questions/**/like").hasAnyRole("USER", "ADMIN")
                         .anyRequest().permitAll());
         return http.build();
     }
