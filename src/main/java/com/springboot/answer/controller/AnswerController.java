@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
 @RestController
-@RequestMapping("/qna/answers")
+@RequestMapping("/qna/questions/{question-id}/answers")
 @Validated
 public class AnswerController {
     private final AnswerService answerService;
@@ -29,8 +29,10 @@ public class AnswerController {
     }
 
     @PostMapping
-    public ResponseEntity postAnswer(@Valid @RequestBody AnswerDto.Post postDto,
+    public ResponseEntity postAnswer(@PathVariable("question-id") long questionId,
+                                     @Valid @RequestBody AnswerDto.Post postDto,
                                      @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        postDto.setQuestionId(questionId);
         postDto.setMemberId(customPrincipal.getMemberId());
         Answer answer = mapper.answerPostToAnswer(postDto);
         Answer createdAnswer = answerService.createAnswer(answer);
@@ -48,7 +50,7 @@ public class AnswerController {
     }
 
     @DeleteMapping("/{answer-id}")
-    public ResponseEntity deleteAnswer(@PathVariable("answer-id") long answerId){
+    public ResponseEntity deleteAnswer(@PathVariable("answer-id") long answerId) {
         answerService.deleteAnswer(answerId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
