@@ -19,4 +19,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Optional<Question> findQuestionByIdAndAccess(@Param("questionId") Long questionId,
                                                  @Param("memberId") Long memberId,
                                                  @Param("isAdmin") boolean isAdmin);
+
+
 }

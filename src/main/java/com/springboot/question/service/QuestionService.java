@@ -46,13 +46,18 @@ public class QuestionService {
         return questionRepository.save(findQuestion);
     }
 
-    public Page<Question> findQuestions(int page, int size){
+    public Page<Question> findQuestions(int page, int size, String sortType){
         // 페이지 번호 검증
         if(page < 1){
             throw new IllegalArgumentException("페이지의 번호는 1 이상이어야 합니다.");
         }
-        Pageable pageable = PageRequest.of(page -1, size, Sort.by("questionId").descending());
-        // 비밀글 제외하고 조회(repo 쿼리)
+        // 정렬 조건 설정
+        if(sortType == null || sortType.isBlank()){
+            sortType = "newest";
+        }
+        Sort sort = getSortType(sortType);
+        Pageable pageable = PageRequest.of(page -1, size, sort);
+        // 비활성화 글 제외하고 조회
         return questionRepository.findAllQuestionsWithoutDeactivated(pageable);
     }
 
@@ -100,6 +105,26 @@ public class QuestionService {
     // 답변 삭제 시 질문의 answer null로 만드는 메서드
     public void setAnswerNull(long questionId){
         findVerifiedQuestion(questionId).setAnswer(null);
+    }
+
+    // 정렬 조건 설정
+    private Sort getSortType(String sortType){
+        switch (sortType.toUpperCase()){
+            case "NEWEST":
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+            case "OLDEST":
+                return Sort.by(Sort.Direction.ASC, "createdAt");
+            case "MOSTLIKES":
+                return Sort.by(Sort.Direction.DESC, "likeCount");
+            case "LEASTLIKES":
+                return Sort.by(Sort.Direction.ASC, "likeCount");
+            case "MOSTVIEWS":
+                return Sort.by(Sort.Direction.DESC, "viewCount");
+            case "LEASTVIEWS":
+                return Sort.by(Sort.Direction.ASC, "viewCount");
+            default:
+                throw new IllegalArgumentException("올바른 정렬 조건을 입력해 주세요: " + sortType);
+        }
     }
 
 
