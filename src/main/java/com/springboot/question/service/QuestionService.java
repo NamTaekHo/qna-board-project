@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -19,13 +20,23 @@ import java.util.Optional;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final MemberService memberService;
+    private final StorageService storageService;
 
-    public QuestionService(QuestionRepository questionRepository, MemberService memberService) {
+    public QuestionService(QuestionRepository questionRepository, MemberService memberService, StorageService storageService) {
         this.questionRepository = questionRepository;
         this.memberService = memberService;
+        this.storageService = storageService;
     }
 
-    public Question createQuestion(Question question){
+    public Question createQuestion(Question question, MultipartFile questionImage){
+        if(questionImage != null && !questionImage.isEmpty()){
+            question.setQuestionImage(questionImage.getOriginalFilename());
+            String customFileName = question.getMember().getMemberId() + "_" + System.currentTimeMillis();
+            storageService.store(questionImage, customFileName);
+            question.setQuestionImage(customFileName);
+        } else {
+            question.setQuestionImage("C:\\backend\\jpa-qna\\qna-project\\src\\main\\resources\\questionImage\\noImage.png");
+        }
         memberService.findVerifiedMember(question.getMember().getMemberId());
         return questionRepository.save(question);
     }

@@ -37,6 +37,9 @@ public class Question extends BaseEntity {
     @Column(length = 20, nullable = false)
     private Visibility visibility = Visibility.QUESTION_PUBLIC;
 
+    @Column
+    private String questionImage;
+
     @Column(nullable = false)
     private int viewCount = 0;
 

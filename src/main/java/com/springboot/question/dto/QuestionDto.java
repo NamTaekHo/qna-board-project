@@ -59,6 +59,7 @@ public class QuestionDto {
         private int viewCount;
         private long memberId;
         private AnswerDto.Response answer;
+        private String questionImage;
         private int likeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

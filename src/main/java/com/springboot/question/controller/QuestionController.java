@@ -16,10 +16,12 @@ import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -44,15 +46,16 @@ public class QuestionController {
         this.memberService = memberService;
     }
 
-    @PostMapping
-    public ResponseEntity postQuestion(@Valid @RequestBody QuestionDto.Post postDto,
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity postQuestion(@Valid @RequestPart QuestionDto.Post postDto,
+                                       @RequestPart(required = false) MultipartFile questionImage,
                                        @AuthenticationPrincipal CustomPrincipal customPrincipal){
         // dto에 memberId set
         postDto.setMemberId(customPrincipal.getMemberId());
         // mapper로 dto -> entity
         Question question = questionMapper.questionPostToQuestion(postDto);
         // question만들고
-        Question createdQuestion = questionService.createQuestion(question);
+        Question createdQuestion = questionService.createQuestion(question,questionImage);
         // URI 만들기
         URI location = UriCreator.createUri(QUESTION_DEFAULT_URL, createdQuestion.getQuestionId());
         return ResponseEntity.created(location).build();

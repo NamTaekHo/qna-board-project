@@ -28,6 +28,11 @@ spring:
         - POST
         - PATCH
         - DELETE
+  servlet:
+    multipart:
+      enabled: true #Multipart 요청 활성화
+      max-file-size: 10MB
+      file-size-threshold: 2KB
 
 logging:
   level:
