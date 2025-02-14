@@ -46,7 +46,7 @@ public class QuestionService {
         return questionRepository.save(findQuestion);
     }
 
-    public Page<Question> findQuestions(int page, int size, String sortType){
+    public Page<Question> findQuestions(int page, int size, String sortType, Member currentMember){
         // 페이지 번호 검증
         if(page < 1){
             throw new IllegalArgumentException("페이지의 번호는 1 이상이어야 합니다.");
@@ -58,7 +58,9 @@ public class QuestionService {
         Sort sort = getSortType(sortType);
         Pageable pageable = PageRequest.of(page -1, size, sort);
         // 비활성화 글 제외하고 조회
-        return questionRepository.findAllQuestionsWithoutDeactivated(pageable);
+        Page<Question> questionPage = questionRepository.findAllQuestionsWithoutDeactivated(pageable);
+        questionPage.forEach(question -> question.setTitle(question.getDisplayTitle(currentMember)));
+        return questionPage;
     }
 
     public Question findQuestion(Long questionId, Long memberId, boolean isAdmin){

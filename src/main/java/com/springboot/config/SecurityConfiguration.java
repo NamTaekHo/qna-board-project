@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                         .antMatchers(HttpMethod.GET, "/qna/members").hasRole("ADMIN")
                         .antMatchers(HttpMethod.PATCH, "/qna/members/**").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/qna/members/**").hasAnyRole("USER", "ADMIN")
-                        .antMatchers(HttpMethod.POST, "/qna/members").hasAnyRole("USER", "ADMIN")
+                        .antMatchers(HttpMethod.POST, "/qna/members").permitAll()
                         // Question
                         .antMatchers(HttpMethod.POST, "/qna/questions").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/qna/questions/**").authenticated()

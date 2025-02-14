@@ -77,6 +77,16 @@ public class Question extends BaseEntity {
         this.likeCount -= 1;
     }
 
+    public String getDisplayTitle(Member currentUser){
+        if(visibility == Visibility.QUESTION_SECRET){
+            if(member.equals(currentUser) || currentUser.getRoles().contains("ROLE_ADMIN")){
+                return title;
+            } else {
+                return "비밀글입니다.";
+            }
+        } return title;
+    }
+
     public enum QuestionStatus{
         QUESTION_REGISTERED("질문 등록"),
         QUESTION_ANSWERED("답변 완료"),

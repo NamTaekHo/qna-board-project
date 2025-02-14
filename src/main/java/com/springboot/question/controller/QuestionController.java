@@ -5,6 +5,7 @@ import com.springboot.auth.MemberDetailsService;
 import com.springboot.dto.MultiResponseDto;
 import com.springboot.dto.SingleResponseDto;
 import com.springboot.like.service.LikeService;
+import com.springboot.member.entity.Member;
 import com.springboot.member.service.MemberService;
 import com.springboot.question.dto.QuestionDto;
 import com.springboot.question.entity.Question;
@@ -34,11 +35,13 @@ public class QuestionController {
     private final QuestionMapper questionMapper;
     private final QuestionService questionService;
     private final LikeService likeService;
+    private final MemberService memberService;
 
-    public QuestionController(QuestionMapper questionMapper, QuestionService questionService, LikeService likeService) {
+    public QuestionController(QuestionMapper questionMapper, QuestionService questionService, LikeService likeService, MemberService memberService) {
         this.questionMapper = questionMapper;
         this.questionService = questionService;
         this.likeService = likeService;
+        this.memberService = memberService;
     }
 
     @PostMapping
@@ -79,8 +82,10 @@ public class QuestionController {
 
     @GetMapping
     public ResponseEntity getQuestions(@Positive @RequestParam int page, @Positive @RequestParam int size,
-                                       @RequestParam(defaultValue = "newest") String sortType){
-        Page<Question> questionPage = questionService.findQuestions(page, size, sortType);
+                                       @RequestParam(defaultValue = "newest") String sortType,
+                                       @AuthenticationPrincipal CustomPrincipal customPrincipal){
+        Member currentMember = memberService.findVerifiedMember(customPrincipal.getMemberId());
+        Page<Question> questionPage = questionService.findQuestions(page, size, sortType, currentMember);
         List<Question> questions = questionPage.getContent();
         return new ResponseEntity(new MultiResponseDto<>
                 (questionMapper.questionsToQuestionResponses(questions), questionPage), HttpStatus.OK);
