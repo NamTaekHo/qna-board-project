@@ -11,6 +11,7 @@ import com.springboot.auth.jwt.JwtTokenizer;
 import com.springboot.auth.utils.AuthorityUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -34,11 +35,13 @@ public class SecurityConfiguration {
     private final JwtTokenizer jwtTokenizer;
     private final AuthorityUtils authorityUtils;
     private final MemberDetailsService memberDetailsService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService) {
+    public SecurityConfiguration(JwtTokenizer jwtTokenizer, AuthorityUtils authorityUtils, MemberDetailsService memberDetailsService, RedisTemplate<String, Object> redisTemplate) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
         this.memberDetailsService = memberDetailsService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Bean
@@ -127,7 +130,7 @@ public class SecurityConfiguration {
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
             //  JwtVerificationFilter의 인스턴스를 생성 + JwtVerificationFilter에서 사용되는 객체들을 생성자로 DI
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, memberDetailsService);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, memberDetailsService, redisTemplate);
 
             // addFilter() 메서드를 통해 JwtAuthenticationFilter를 Spring Security Filter Chain에 추가
             builder.addFilter(jwtAuthenticationFilter)
