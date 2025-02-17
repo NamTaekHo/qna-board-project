@@ -62,7 +62,7 @@ public class SecurityConfiguration {
                         // Member
                         .antMatchers(HttpMethod.GET, "/qna/members/**").hasAnyRole("USER", "ADMIN")
                         .antMatchers(HttpMethod.GET, "/qna/members").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.PATCH, "/qna/members/**").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/qna/members/**").authenticated()
                         .antMatchers(HttpMethod.DELETE, "/qna/members/**").hasAnyRole("USER", "ADMIN")
                         .antMatchers(HttpMethod.POST, "/qna/members").permitAll()
                         // Question
@@ -90,10 +90,12 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
         // setAllowedOrigins : 모든 출처에 대해 허용
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         // setAllowedMethods : 지정한 HTTP Method 에 대한 통신 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
-
+        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+        configuration.setExposedHeaders(Arrays.asList("authorization", "Authorization"));
+//        configuration.setAllowCredentials(true);
         // UrlBasedCorsConfigurationSource : CorsConfigurationSource의 구현체
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // 모든 URL에 CORS 정책 적용
