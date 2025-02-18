@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -58,6 +59,7 @@ public class QuestionDto {
         private Question.Visibility visibility;
         private int viewCount;
         private long memberId;
+        private String memberName;
         private AnswerDto.Response answer;
         private String questionImage;
         private int likeCount;

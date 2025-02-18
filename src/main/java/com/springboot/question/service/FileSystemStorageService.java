@@ -17,7 +17,7 @@ import java.util.SimpleTimeZone;
 
 @Slf4j
 public class FileSystemStorageService implements StorageService {
-    private final Path rootLocation = Paths.get("C:\\backend\\jpa-qna\\qna-project\\src\\main\\resources\\questionImage");
+    private final Path rootLocation = Paths.get("src/main/resources/static/questionImage");
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif");
 
     @Override

@@ -29,15 +29,15 @@ public class QuestionService {
     }
 
     public Question createQuestion(Question question, MultipartFile questionImage){
+        memberService.findVerifiedMember(question.getMember().getMemberId());
         if(questionImage != null && !questionImage.isEmpty()){
-            question.setQuestionImage(questionImage.getOriginalFilename());
             String customFileName = question.getMember().getMemberId() + "_" + System.currentTimeMillis();
+            question.setQuestionImage(questionImage.getOriginalFilename());
             storageService.store(questionImage, customFileName);
             question.setQuestionImage(customFileName);
         } else {
-            question.setQuestionImage("C:\\backend\\jpa-qna\\qna-project\\src\\main\\resources\\questionImage\\noImage.png");
+            question.setQuestionImage("noImage.png");
         }
-        memberService.findVerifiedMember(question.getMember().getMemberId());
         return questionRepository.save(question);
     }
 
